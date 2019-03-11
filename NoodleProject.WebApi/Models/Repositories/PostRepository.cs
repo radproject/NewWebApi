@@ -8,7 +8,7 @@ using System.Web;
 
 namespace NoodleProject.WebApi.Models.Repositories
 {
-    public class PostRepository : IRepository<Db.Post, int> //Inherits from 
+    public class PostRepository : IPostRepository
     {
         ApplicationDbContext context = new ApplicationDbContext();
         public PostRepository(ApplicationDbContext context)
@@ -33,6 +33,11 @@ namespace NoodleProject.WebApi.Models.Repositories
         public ICollection<Post> getAll()
         {
             return this.context.Posts.ToList();
+        }
+
+        public ICollection<Post> getAllByThreadId(int ThreadId)
+        {
+            return this.context.Posts.Where(x => x.ThreadID == ThreadId).ToList();
         }
 
         public Post GetOneById(int id)

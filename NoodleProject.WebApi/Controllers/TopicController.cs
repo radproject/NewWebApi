@@ -12,96 +12,122 @@ using System.Web.Http;
 
 namespace NoodleProject.WebApi.Controllers
 {
+    [RoutePrefix("topics")]
     public class TopicController : ApiController
     {
-        [RoutePrefix("posts")]
-        public class PostController : ApiController
+
+        private ITopicRepository repository;
+        private IRepository<ApplicationUser, string> userRepository;
+
+        public TopicController(ITopicRepository repository)
         {
-            private IRepository<Topic, int> repository;
-            private IRepository<ApplicationUser, string> userRepository;
+            this.repository = repository;
+        }
 
-            public PostController(IRepository<Topic, int> repository)
+        #region Controllers
+        [HttpGet]
+        [Route("getbyid")]
+        [Authorize]
+        public async Task<Topic> GetById(int id)
+        {
+            Topic topics = repository.GetOneById(id);
+            return topics;
+        }
+
+        [HttpGet]
+        [Route("getall")]
+        [Authorize]
+        public async Task<IEnumerable<Topic>> GetAll()
+        {
+            IEnumerable<Topic> topics = repository.getAll();
+            return topics;
+        }
+
+        [HttpGet]
+        [Route("getallfortopic")]
+        [Authorize]
+        public async Task<IEnumerable<Topic>> GetAllByUserId(string UserId)
+        {
+            try
             {
-                this.repository = repository;
-            }
+                IEnumerable<Topic> topicData = this.repository.getAllForUserId(UserId);
 
-            #region Controllers
-            [HttpGet]
-            [Route("getbyid")]
-            [Authorize]
-            public async Task<Topic> GetById(int id)
+                return topicData;
+            }
+            catch
             {
-                Topic topics = repository.GetOneById(id);
-                return topics;
+                return null;
             }
+        }
 
-            [HttpGet]
-            [Route("getall")]
-            [Authorize]
-            public async Task<IEnumerable<Topic>> GetAll()
+        [HttpPost]
+        [Route("create")]
+        [Authorize]
+        public async Task<IHttpActionResult> CreatePost([FromBody]TopicBindingModel model)
+        {
+            try
             {
-                IEnumerable<Topic> topics = repository.getAll();
-                return topics;
+                //ApplicationUser creator = 
+                repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                return Ok("Topic Created");
             }
-
-            [HttpPost]
-            [Route("create")]
-            [Authorize]
-            public async Task<IHttpActionResult> CreatePost([FromBody]TopicBindingModel model)
+            catch
             {
-                try
-                {
-                    //ApplicationUser creator = 
-                    repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
-                    return Ok("Topic Created");
-                }
-                catch
-                {
-                    return BadRequest("Bad Request");
-                }
+                return BadRequest("Bad Request");
             }
+        }
 
-            [HttpPatch]
-            [Route("update")]
-            [Authorize]
-            public async Task<IHttpActionResult> UpdatePost([FromBody]TopicBindingModel model)
+        [HttpPatch]
+        [Route("update")]
+        [Authorize]
+        public async Task<IHttpActionResult> UpdatePost([FromBody]TopicBindingModel model)
+        {
+            try
             {
-                try
-                {
-                    repository.UpdateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
-                    return Ok("Topic Updated");
-                }
-                catch
-                {
-                    return BadRequest("Bad Request");
-                }
+                repository.UpdateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                return Ok("Topic Updated");
             }
-
-            [HttpPost]
-            [Route("DeletePost")]
-            [Authorize]
-            public async Task<IHttpActionResult> DeletePost(int id)
+            catch
             {
-                try
-                {
-                    repository.DeleteOneById(id);
-                    return Ok("Topic Deleted");
-                }
-                catch
-                {
-                    return BadRequest("Bad Request");
-                }
+                return BadRequest("Bad Request");
             }
+        }
 
-            [HttpPost]
-            [Route("AddSubscriberToPost")]
-            [Authorize]
-            public async Task<IHttpActionResult> AddSub(int TopicId, string UserId)
+        [HttpPost]
+        [Route("DeletePost")]
+        [Authorize]
+        public async Task<IHttpActionResult> DeletePost(int id)
+        {
+            try
+            {
+                repository.DeleteOneById(id);
+                return Ok("Topic Deleted");
+            }
+            catch
+            {
+                return BadRequest("Bad Request");
+            }
+        }
+
+        [HttpPost]
+        [Route("AddSubscriberToPost")]
+        [Authorize]
+        public async Task<IHttpActionResult> AddSub(int TopicId, string UserId)
+        {
+            try
             {
                 Topic topics = this.repository.GetOneById(TopicId);
-                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId); 
+                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
+
+                topics.subscribers.Add(applicationUser);
+                this.repository.UpdateOne(topics);
+                return Ok();
             }
-            #endregion
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
+        #endregion
     }
 }

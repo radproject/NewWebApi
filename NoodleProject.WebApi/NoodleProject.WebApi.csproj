@@ -251,6 +251,7 @@
     <Compile Include="Models\Db\Topics.cs" />
     <Compile Include="Models\Posts\PostBindingModel.cs" />
     <Compile Include="Models\Posts\PostViewModel.cs" />
+    <Compile Include="Models\Repositories\IPostRepository.cs" />
     <Compile Include="Models\Repositories\IRepository.cs" />
     <Compile Include="Models\Repositories\PostRepository.cs" />
     <Compile Include="Models\Repositories\TopicRepository.cs" />

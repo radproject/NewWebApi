@@ -15,9 +15,10 @@ namespace NoodleProject.WebApi.Controllers
     [RoutePrefix("posts")]
     public class PostController : ApiController
     {
-        private IRepository<Post, int> repository;
+        private IPostRepository repository;
+        private IRepository<ApplicationUser, string> userRepository;
 
-        public PostController(IRepository<Post, int> repository)
+        public PostController(IPostRepository repository)
         {
             this.repository = repository;
         }
@@ -33,11 +34,11 @@ namespace NoodleProject.WebApi.Controllers
         }
 
         [HttpGet]
-        [Route("getall")]
+        [Route("getforthread")]
         [Authorize]
-        public async Task<IEnumerable<Post>> GetAll()
+        public async Task<IEnumerable<Post>> GetAllForThread(int ThreadId)
         {
-            IEnumerable<Post> posts = repository.getAll();
+            IEnumerable<Post> posts = this.repository.getAllByThreadId(ThreadId);
             return posts;
         }
 
@@ -48,8 +49,8 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                //ApplicationUser creator = 
-                repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = model.creator, Text = model.Text });
+                ApplicationUser creator = this.userRepository.GetOneById(model.UserId);
+                repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = creator, Text = model.Text });
                 return Ok("Post Created");
             }
             catch
@@ -87,7 +88,7 @@ namespace NoodleProject.WebApi.Controllers
             }
             catch
             {
-                BadRequest("Bad Request");
+                return BadRequest("Bad Request");
             }
         }
 

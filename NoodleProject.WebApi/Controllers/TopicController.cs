@@ -89,7 +89,7 @@ namespace NoodleProject.WebApi.Controllers
                 }
                 catch
                 {
-                    BadRequest("Bad Request");
+                    return BadRequest("Bad Request");
                 }
             }
 

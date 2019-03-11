@@ -8,7 +8,7 @@ using System.Web;
 
 namespace NoodleProject.WebApi.Models.Repositories
 {
-    public class PostRepository : IRepository<Db.Post, int>
+    public class PostRepository : IRepository<Db.Post, int> //Inherits from 
     {
         ApplicationDbContext context = new ApplicationDbContext();
         public PostRepository(ApplicationDbContext context)

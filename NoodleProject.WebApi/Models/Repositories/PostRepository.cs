@@ -36,13 +36,14 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Post GetOneById(int id)
         {
-            return this.context.Posts.Where(x => x.ID === id).SingleOrDefault;
+            return this.context.Posts.Where(x => x.ID == id).SingleOrDefault();
         }
 
         public Post UpdateOne(Post parameters)
         {
             this.context.Posts.AddOrUpdate(x => x.ID, parameters);
             this.context.SaveChanges();
+            return parameters;
         }
     }
 }

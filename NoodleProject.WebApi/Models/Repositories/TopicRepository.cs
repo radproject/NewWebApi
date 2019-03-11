@@ -17,7 +17,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Topic CreateOne(Topic parameters)
         {
-            throw new NotImplementedException();
+            throw new NotFiniteNumberException(0000000.0000);
         }
 
         public void DeleteOneById(int id)

@@ -34,25 +34,93 @@ namespace NoodleProject.WebApi.Models.Context
                 manager.Create(role);
             }
 
+            PasswordHasher ps = new PasswordHasher();
+
             var userStore = new UserStore<ApplicationUser>(context);
             var userManager = new UserManager<ApplicationUser>(userStore);
-            ApplicationUser admin = new ApplicationUser();
-            admin.Email = "admin@noodle.com";
-            admin.UserName = "admin@noodle.com";
 
-            userManager.Create(admin, "noodleAdmin$1");
+
+
+
+            ApplicationUser admin = new ApplicationUser()
+            {
+                FirstName = "noodle",
+                LastName = "admin",
+                Email = "admin@noodle.com",
+                UserName = "admin@noodle.com",
+                PasswordHash = ps.HashPassword("administrator$1"),
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+            
+           
+            
             userManager.AddToRole(admin.Id, "Admin");
 
+            ApplicationUser Lecturer = new ApplicationUser()
+            {
+                FirstName = "Paul",
+                LastName = "Pawell",
+                Email = "PaulP@noodle.com",
+                UserName = "PaulPnoodle.com",
+                PasswordHash = ps.HashPassword("Paul2019"),
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
+
+                
+            };
+
+            userManager.AddToRole(Lecturer.Id, "Lecturer");
+
+            ApplicationUser Student = new ApplicationUser()
+            {
+                FirstName = "Karolis",
+                LastName = "Gunka",
+                Email = "karolis.gunka@mail.itlsigo.ie",
+                UserName = "karolis.gunka@mail.itlsigo.ie",
+                PasswordHash = ps.HashPassword("Gunka2019"),
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
+
+
+            };
+
+            userManager.AddToRole(Student.Id, "Student");
+
+            ApplicationUser Student1 = new ApplicationUser()
+            {
+                FirstName = "Alan",
+                LastName = "Jachimczak",
+                Email = "Alan.Jackimczak@mail.itlsigo.ie",
+                UserName = "Alan.Jackimczak@mail.itlsigo.ie",
+                PasswordHash = ps.HashPassword("Alan2019"),
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString()
+
+
+            };
+            userManager.AddToRole(Student1.Id, "Student");
+
             context.SaveChanges();
+
         }
 
         private void SeedTopics(ApplicationDbContext context)
         {
             ApplicationUser au = context.Users.Where(x => x.Email == "admin@noodle.com").SingleOrDefault();
+            ApplicationUser Lecturer = context.Users.Where(x => x.Email == "PaulP@noodle.com").SingleOrDefault();
+            ApplicationUser Student= context.Users.Where(x => x.Email == "karolis.gunka@mail.itlsigo.ie").SingleOrDefault();
+            ApplicationUser Student1 = context.Users.Where(x => x.Email == "Alan.Jackimczak@mail.itlsigo.ie").SingleOrDefault();
+
             var threads = new List<Topic>
             {
-                new Topic{Title = "Welcome to Noodle!", CreationDate = DateTime.Now, creator = au, subscribers = new List<ApplicationUser>() { au }, isPrivate = false, posts = new List<Db.Post> { new Db.Post() { creator = au, Text = "Hello everyone! This is the admin speaking! Welcome to Noodle, the better and faster version of Moodle! Here you can get to know the platform and ask any general questions. Enjoy the stay!" } } }
+                new Topic{Title = "Welcome to Noodle!", CreationDate = DateTime.Now, creator = au, subscribers = new List<ApplicationUser>() { au, Lecturer, Student, Student1 }, isPrivate = false, posts = new List<Db.Post> { new Db.Post() { creator = au, Text = "Hello everyone! This is the admin speaking! Welcome to Noodle, the better and faster version of Moodle! Here you can get to know the platform and ask any general questions. Enjoy the stay!" } } } ,
+                new Topic{Title = "Its a private topic", CreationDate = DateTime.Now, creator = Student, subscribers = new List<ApplicationUser>() {Student, Lecturer }, isPrivate = true, posts = new List<Db.Post>{new Db.Post() { creator = Student, Text = "Hello this is a private and confidential topic that the student and lecturer can discuss in private"} } },
+                new Topic{Title = "How you guys thing about the course?", CreationDate = DateTime.Now, creator = Student1, subscribers = new List<ApplicationUser>() {Student1, Student}, isPrivate = false, posts = new List<Db.Post>{new Db.Post() { creator = Student1, Text = "Hi, in here you guys can discuss about your course and share what you like or dislike about it!"} } }
+                
             };
+
+            
 
             threads.ForEach(thread =>
             {

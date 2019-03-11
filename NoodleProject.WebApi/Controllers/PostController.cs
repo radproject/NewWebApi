@@ -41,22 +41,22 @@ namespace NoodleProject.WebApi.Controllers
             return posts;
         }
 
-        [HttpPost]
-        [Route("create")]
-        [Authorize]
-        public async Task<IHttpActionResult> CreatePost([FromBody]PostBindingModel model)
-        {
-            try
-            {
-                //ApplicationUser creator = 
-                repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = model.creator, Text = model.Text });
-                return Ok("Post Created");
-            }
-            catch
-            {
-                return BadRequest("Bad Request");
-            }
-        }
+        //[HttpPost]
+        //[Route("create")]
+        //[Authorize]
+        //public async Task<IHttpActionResult> CreatePost([FromBody]PostBindingModel model)
+        //{
+        //    try
+        //    {
+        //        //ApplicationUser creator = 
+        //        repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = model.creator, Text = model.Text });
+        //        return Ok("Post Created");
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest("Bad Request");
+        //    }
+        //}
 
 
         [HttpPatch]
@@ -87,7 +87,7 @@ namespace NoodleProject.WebApi.Controllers
             }
             catch
             {
-                BadRequest("Bad Request");
+                return BadRequest("Bad Request");
             }
         }
 

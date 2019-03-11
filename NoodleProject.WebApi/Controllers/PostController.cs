@@ -1,4 +1,5 @@
-﻿using NoodleProject.WebApi.Models.Db;
+﻿using NoodleProject.WebApi.Models.Context;
+using NoodleProject.WebApi.Models.Db;
 using NoodleProject.WebApi.Models.Posts;
 using NoodleProject.WebApi.Models.Repositories;
 using System;
@@ -25,17 +26,19 @@ namespace NoodleProject.WebApi.Controllers
         [HttpGet]
         [Route("getbyid")]
         [Authorize]
-        public async Task<PostViewModel> GetById(int id)
+        public async Task<Post> GetById(int id)
         {
-            throw new NotImplementedException();
+            Post posts = repository.GetOneById(id);
+            return posts;
         }
 
         [HttpGet]
         [Route("getall")]
         [Authorize]
-        public async Task<IEnumerable<PostViewModel>> GetAll()
+        public async Task<IEnumerable<Post>> GetAll()
         {
-            throw new NotImplementedException();
+            IEnumerable<Post> posts = repository.getAll();
+            return posts;
         }
 
         [HttpPost]
@@ -43,15 +46,33 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<IHttpActionResult> CreatePost([FromBody]PostBindingModel model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //ApplicationUser creator = 
+                repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = model.creator, Text = model.Text });
+                return Ok("Post Created");
+            }
+            catch
+            {
+                return BadRequest("Bad Request");
+            }
         }
+
 
         [HttpPatch]
         [Route("update")]
         [Authorize]
         public async Task<IHttpActionResult> UpdatePost([FromBody]PostBindingModel model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                repository.UpdateOne(new Post { ThreadID = model.ThreadId, Text = model.Text });
+                return Ok("Post Updated");
+            }
+            catch
+            {
+                return BadRequest("Bad Request");
+            } 
         }
 
         [HttpPost]
@@ -59,8 +80,20 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<IHttpActionResult> DeletePost(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                repository.DeleteOneById(id);
+                return Ok("Post Deleted");
+            }
+            catch
+            {
+                BadRequest("Bad Request");
+            }
         }
-        #endregion
-    }
+
+
+
+
+    }    
 }
+        #endregion

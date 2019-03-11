@@ -2,6 +2,7 @@
 using NoodleProject.WebApi.Models.Db;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web;
 
@@ -15,29 +16,33 @@ namespace NoodleProject.WebApi.Models.Repositories
             this.context = context;
         }
 
-        public Db.Post CreateOne(Db.Post parameters)
+        public Post CreateOne(Post parameters)
         {
-            throw new NotImplementedException();
+            Post post = this.context.Posts.Add(parameters);
+            this.context.SaveChanges();
+            return post;
         }
 
         public void DeleteOneById(int id)
         {
-            throw new NotImplementedException();
+            this.context.Posts.Remove(x => x.ID === id);
+            this.context.SaveChanges();
         }
 
-        public ICollection<Db.Post> getAll()
+        public ICollection<Post> getAll()
         {
-            throw new NotImplementedException();
+            return this.context.Posts.ToList();
         }
 
-        public Db.Post GetOneById(int id)
+        public Post GetOneById(int id)
         {
-            throw new NotImplementedException();
+            return this.context.Posts.Where(x => x.ID === id).SingleOrDefault;
         }
 
-        public Db.Post UpdateOne(Db.Post parameters)
+        public Post UpdateOne(Post parameters)
         {
-            throw new NotImplementedException();
+            this.context.Posts.AddOrUpdate(x => x.ID, parameters);
+            this.context.SaveChanges();
         }
     }
 }

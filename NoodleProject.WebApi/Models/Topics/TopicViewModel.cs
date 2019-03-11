@@ -13,8 +13,6 @@ namespace NoodleProject.WebApi.Models.Topics
 
         public int PostId { get; set; }
         public string CreatorId { get; set; }
-        public ICollection<string> SubscribedIds { get; set; }
-
         public bool isPrivate { get; set; }
     }
 }

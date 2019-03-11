@@ -25,7 +25,8 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public void DeleteOneById(int id)
         {
-            this.context.Posts.Remove(x => x.ID === id);
+            Post post = this.context.Posts.Where(x => x.ID == id).SingleOrDefault();
+            this.context.Posts.Remove(post);
             this.context.SaveChanges();
         }
 

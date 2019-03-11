@@ -11,6 +11,13 @@ namespace NoodleProject.WebApi.Models.Posts
         public string Text { get; set; }
         public long TimeStamp { get; set; }
         public int ThreadID { get; set; }
-        public string CreatorId { get; set; }
+        public IUserPostViewModel creator { get; set; }
+    }
+
+    public class IUserPostViewModel
+    {
+        public int ID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 }

@@ -253,6 +253,7 @@
     <Compile Include="Models\Posts\PostViewModel.cs" />
     <Compile Include="Models\Repositories\IPostRepository.cs" />
     <Compile Include="Models\Repositories\IRepository.cs" />
+    <Compile Include="Models\Repositories\ITopicRepository.cs" />
     <Compile Include="Models\Repositories\PostRepository.cs" />
     <Compile Include="Models\Repositories\TopicRepository.cs" />
     <Compile Include="Models\Topics\TopicBindingModel.cs" />

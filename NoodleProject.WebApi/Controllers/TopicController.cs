@@ -1,4 +1,5 @@
-﻿using NoodleProject.WebApi.Models.Db;
+﻿using NoodleProject.WebApi.Models.Context;
+using NoodleProject.WebApi.Models.Db;
 using NoodleProject.WebApi.Models.Repositories;
 using NoodleProject.WebApi.Models.Topics;
 using System;
@@ -17,6 +18,7 @@ namespace NoodleProject.WebApi.Controllers
         public class PostController : ApiController
         {
             private IRepository<Topic, int> repository;
+            private IRepository<ApplicationUser, string> userRepository;
 
             public PostController(IRepository<Topic, int> repository)
             {
@@ -27,17 +29,19 @@ namespace NoodleProject.WebApi.Controllers
             [HttpGet]
             [Route("getbyid")]
             [Authorize]
-            public async Task<TopicViewModel> GetById(int id)
+            public async Task<Topic> GetById(int id)
             {
-                throw new NotImplementedException();
+                Topic topics = repository.GetOneById(id);
+                return topics;
             }
 
             [HttpGet]
             [Route("getall")]
             [Authorize]
-            public async Task<IEnumerable<TopicViewModel>> GetAll()
+            public async Task<IEnumerable<Topic>> GetAll()
             {
-                throw new NotImplementedException();
+                IEnumerable<Topic> topics = repository.getAll();
+                return topics;
             }
 
             [HttpPost]
@@ -45,7 +49,16 @@ namespace NoodleProject.WebApi.Controllers
             [Authorize]
             public async Task<IHttpActionResult> CreatePost([FromBody]TopicBindingModel model)
             {
-                throw new NotImplementedException();
+                try
+                {
+                    //ApplicationUser creator = 
+                    repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                    return Ok("Topic Created");
+                }
+                catch
+                {
+                    return BadRequest("Bad Request");
+                }
             }
 
             [HttpPatch]
@@ -53,7 +66,15 @@ namespace NoodleProject.WebApi.Controllers
             [Authorize]
             public async Task<IHttpActionResult> UpdatePost([FromBody]TopicBindingModel model)
             {
-                throw new NotImplementedException();
+                try
+                {
+                    repository.UpdateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                    return Ok("Topic Updated");
+                }
+                catch
+                {
+                    return BadRequest("Bad Request");
+                }
             }
 
             [HttpPost]
@@ -61,7 +82,15 @@ namespace NoodleProject.WebApi.Controllers
             [Authorize]
             public async Task<IHttpActionResult> DeletePost(int id)
             {
-                throw new NotImplementedException();
+                try
+                {
+                    repository.DeleteOneById(id);
+                    return Ok("Topic Deleted");
+                }
+                catch
+                {
+                    BadRequest("Bad Request");
+                }
             }
 
             [HttpPost]
@@ -69,7 +98,8 @@ namespace NoodleProject.WebApi.Controllers
             [Authorize]
             public async Task<IHttpActionResult> AddSub(int TopicId, string UserId)
             {
-                throw new NotImplementedException();
+                Topic topics = this.repository.GetOneById(TopicId);
+                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId); 
             }
             #endregion
         }

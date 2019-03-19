@@ -35,7 +35,7 @@ namespace NoodleProject.WebApi.Models.Repositories
             return this.context.Posts.ToList();
         }
 
-        public ICollection<Post> getAllByThreadId(int ThreadId)
+        public IEnumerable<Post> getAllByThreadId(int ThreadId)
         {
             return this.context.Posts.Where(x => x.ThreadID == ThreadId).ToList();
         }

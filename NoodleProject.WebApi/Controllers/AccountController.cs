@@ -21,7 +21,7 @@ using NoodleProject.WebApi.Results;
 namespace NoodleProject.WebApi.Controllers
 {
     [Authorize]
-    [RoutePrefix("api/Account")]
+    [RoutePrefix("account")]
     public class AccountController : ApiController
     {
         private const string LocalLoginProvider = "Local";

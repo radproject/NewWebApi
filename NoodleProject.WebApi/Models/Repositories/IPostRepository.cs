@@ -8,6 +8,6 @@ namespace NoodleProject.WebApi.Models.Repositories
 {
     public interface IPostRepository: IRepository<Post, int>
     {
-        IEnumarable<Post> getAllByThreadId(int ThreadId);
+        IEnumerable<Post> getAllByThreadId(int ThreadId);
     }
 }

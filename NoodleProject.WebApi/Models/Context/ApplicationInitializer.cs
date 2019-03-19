@@ -52,10 +52,8 @@ namespace NoodleProject.WebApi.Models.Context
                 EmailConfirmed = true,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
-            
-           
-            
-            userManager.AddToRole(admin.Id, "Admin");
+
+            context.Users.Add(admin);
 
             ApplicationUser Lecturer = new ApplicationUser()
             {
@@ -69,8 +67,8 @@ namespace NoodleProject.WebApi.Models.Context
 
                 
             };
+            context.Users.Add(Lecturer);
 
-            userManager.AddToRole(Lecturer.Id, "Lecturer");
 
             ApplicationUser Student = new ApplicationUser()
             {
@@ -80,12 +78,11 @@ namespace NoodleProject.WebApi.Models.Context
                 UserName = "karolis.gunka@mail.itlsigo.ie",
                 PasswordHash = ps.HashPassword("Gunka2019"),
                 EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString()
-
-
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Id = "S00157347"
             };
+            context.Users.Add(Student);
 
-            userManager.AddToRole(Student.Id, "Student");
 
             ApplicationUser Student1 = new ApplicationUser()
             {
@@ -95,10 +92,22 @@ namespace NoodleProject.WebApi.Models.Context
                 UserName = "Alan.Jackimczak@mail.itlsigo.ie",
                 PasswordHash = ps.HashPassword("Alan2019"),
                 EmailConfirmed = true,
-                SecurityStamp = Guid.NewGuid().ToString()
-
+                SecurityStamp = Guid.NewGuid().ToString(),
+                Id = "S00168420"
 
             };
+            context.Users.Add(Student1);
+
+            context.SaveChanges();
+
+            admin = userManager.FindByEmail(admin.Email);
+            Lecturer = userManager.FindByEmail(Lecturer.Email);
+            Student = userManager.FindByEmail(Student.Email);
+            Student1 = userManager.FindByEmail(Student1.Email);
+
+            userManager.AddToRole(admin.Id, "Admin");
+            userManager.AddToRole(Lecturer.Id, "Lecturer");
+            userManager.AddToRole(Student.Id, "Student");
             userManager.AddToRole(Student1.Id, "Student");
 
             context.SaveChanges();

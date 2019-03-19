@@ -24,6 +24,13 @@ namespace NoodleProject.WebApi.Controllers
             this.repository = repository;
         }
 
+        public TopicController()
+        {
+            ApplicationDbContext dbContext = new ApplicationDbContext();
+            this.repository = new TopicRepository(dbContext);
+            this.userRepository = new UserRepository();
+        }
+
         #region Controllers
         [HttpGet]
         [Route("getbyid")]

@@ -1,4 +1,5 @@
-﻿using NoodleProject.WebApi.Models.Context;
+﻿using Ninject;
+using NoodleProject.WebApi.Models.Context;
 using NoodleProject.WebApi.Models.Db;
 using NoodleProject.WebApi.Models.Posts;
 using NoodleProject.WebApi.Models.Repositories;
@@ -15,12 +16,20 @@ namespace NoodleProject.WebApi.Controllers
     [RoutePrefix("posts")]
     public class PostController : ApiController
     {
-        private IPostRepository repository;
-        private IRepository<ApplicationUser, string> userRepository;
+        [Inject]
+        public IPostRepository repository { get; set; }
+        public IRepository<ApplicationUser, string> userRepository { get; set; }
 
         public PostController(IPostRepository repository)
         {
             this.repository = repository;
+        }
+
+        public PostController()
+        {
+            ApplicationDbContext dbContext = new ApplicationDbContext();
+            this.repository = new PostRepository(dbContext);
+            this.userRepository = new UserRepository();
         }
 
         #region Controllers

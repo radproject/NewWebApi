@@ -8,7 +8,7 @@ using System.Web;
 
 namespace NoodleProject.WebApi.Models.Repositories
 {
-    public class TopicRepository : IRepository<Topic, int>
+    public class TopicRepository :ITopicRepository
     {
         ApplicationDbContext context = new ApplicationDbContext();
         public TopicRepository(ApplicationDbContext context)
@@ -33,6 +33,11 @@ namespace NoodleProject.WebApi.Models.Repositories
         public ICollection<Topic> getAll()
         {
             return this.context.Topics.ToList();
+        }
+
+        public IEnumerable<Topic> getAllForUserId(string UserId)
+        {
+            return this.context.Topics.Where(x => x.creator.Id == UserId).ToList();
         }
 
         public Topic GetOneById(int id)

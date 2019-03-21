@@ -75,6 +75,18 @@ namespace NoodleProject.WebApi.Controllers
             return Ok();
         }
 
+        [Route("GetAccount")]
+        [Authorize]
+        public ApplicationUser GetInfo()
+        {
+            string id = Authentication.User.Identity.GetUserId();
+
+            ApplicationUser au = this.UserManager.FindById(id);
+
+            return au;
+        }
+
+
         // GET api/Account/ManageInfo?returnUrl=%2F&generateState=true
         [Route("ManageInfo")]
         public async Task<ManageInfoViewModel> GetManageInfo(string returnUrl, bool generateState = false)

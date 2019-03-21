@@ -42,7 +42,9 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Topic GetOneById(int id)
         {
-            return this.context.Topics.Where(t => t.ID == id).SingleOrDefault();
+            Topic tempTopic = this.context.Topics.Where(t => t.ID == id).SingleOrDefault();
+            tempTopic.posts = this.context.Posts.Where(p => p.ThreadID == id).ToArray();
+            return tempTopic;
         }
 
         public Topic UpdateOne(Topic parameters)

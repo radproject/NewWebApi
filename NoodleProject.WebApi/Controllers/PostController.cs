@@ -86,7 +86,7 @@ namespace NoodleProject.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("DeletePost")]
+        [Route("delete")]
         [Authorize]
         public async Task<IHttpActionResult> DeletePost(int id)
         {

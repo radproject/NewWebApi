@@ -32,7 +32,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public ICollection<Topic> getAll()
         {
-            return this.context.Topics.ToList();
+            return this.context.Topics.Where(t => (t.isPrivate == false)).ToList();
         }
 
         public IEnumerable<Topic> getAllForUserId(string UserId)

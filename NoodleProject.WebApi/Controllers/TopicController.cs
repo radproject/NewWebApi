@@ -135,6 +135,26 @@ namespace NoodleProject.WebApi.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost]
+        [Route("DeleteSubscriberFromAList")]
+        [Authorize]
+        public async Task<IHttpActionResult> RemoveSub(int TopicId, string UserId)
+        {
+            try
+            {
+                Topic topics = this.repository.GetOneById(TopicId);
+                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
+
+                topics.subscribers.Remove(applicationUser);
+                this.repository.UpdateOne(topics);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         #endregion
     }
 }

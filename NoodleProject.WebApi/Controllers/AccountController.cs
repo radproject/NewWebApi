@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -341,6 +342,10 @@ namespace NoodleProject.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            if(!Regex.IsMatch(model.Email, @"((s|S)\d{8}|\w{1,}\.\w{1,})@(mail.|)itsligo.ie"))
+            {   
+                return BadRequest("You cannot register for this website if you are not a member of IT Sligo!");
+            }
             var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);

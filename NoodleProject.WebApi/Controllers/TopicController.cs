@@ -46,11 +46,12 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<IEnumerable<Topic>> GetAll()
         {
-            return null; //deprecated
+            IEnumerable<Topic> topics = repository.getAll();
+            return topics;
         }
 
         [HttpGet]
-        [Route("getallfortopic")]
+        [Route("getsubscribedtopics")]
         [Authorize]
         public async Task<IEnumerable<Topic>> GetAllByUserId(string UserId)
         {

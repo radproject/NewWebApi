@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using Microsoft.AspNet.Identity;
 
 namespace NoodleProject.WebApi.Controllers
 {
@@ -37,8 +38,7 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<Topic> GetById(int id)
         {
-            Topic topics = repository.GetOneById(id);
-            return topics;
+            return null; //deprecated
         }
 
         [HttpGet]
@@ -46,8 +46,7 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<IEnumerable<Topic>> GetAll()
         {
-            IEnumerable<Topic> topics = repository.getAll();
-            return topics;
+            return null; //deprecated
         }
 
         [HttpGet]
@@ -74,8 +73,13 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                //ApplicationUser creator = 
-                repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId() && !User.IsInRole("Admin"));
+
+                if(user == null)
+                {
+                    return BadRequest("Bad Token! No User present!");
+                }
+                repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creator = user, subscribers = new List<ApplicationUser>() { user }});
                 return Ok("Topic Created");
             }
             catch
@@ -91,6 +95,11 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                Topic t = this.repository.GetOneById(model.ID);
+                if(t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot update a Topic which you are not an admin of!");
+                }
                 repository.UpdateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
                 return Ok("Topic Updated");
             }
@@ -107,6 +116,12 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                Topic t = this.repository.GetOneById(id);
+                if (t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot delete a Topic which you are not an admin of!");
+                }
+
                 repository.DeleteOneById(id);
                 return Ok("Topic Deleted");
             }
@@ -124,6 +139,10 @@ namespace NoodleProject.WebApi.Controllers
             try
             {
                 Topic topics = this.repository.GetOneById(TopicId);
+                if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot add a sub if you are not a creator of this topic!");
+                }
                 ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
 
                 topics.subscribers.Add(applicationUser);
@@ -144,8 +163,12 @@ namespace NoodleProject.WebApi.Controllers
             try
             {
                 Topic topics = this.repository.GetOneById(TopicId);
-                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
+                if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot remove a sub if you are not a creator of this topic!");
+                }
 
+                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
                 topics.subscribers.Remove(applicationUser);
                 this.repository.UpdateOne(topics);
                 return Ok();

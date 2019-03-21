@@ -1,4 +1,5 @@
-﻿using Ninject;
+﻿using Microsoft.AspNet.Identity;
+using Ninject;
 using NoodleProject.WebApi.Models.Context;
 using NoodleProject.WebApi.Models.Db;
 using NoodleProject.WebApi.Models.Posts;
@@ -16,9 +17,9 @@ namespace NoodleProject.WebApi.Controllers
     [RoutePrefix("posts")]
     public class PostController : ApiController
     {
-        [Inject]
         public IPostRepository repository { get; set; }
         public IRepository<ApplicationUser, string> userRepository { get; set; }
+        public ITopicRepository topicRepository { get; set; }
 
         public PostController(IPostRepository repository)
         {
@@ -30,6 +31,7 @@ namespace NoodleProject.WebApi.Controllers
             ApplicationDbContext dbContext = new ApplicationDbContext();
             this.repository = new PostRepository(dbContext);
             this.userRepository = new UserRepository();
+            this.topicRepository = new TopicRepository(dbContext);
         }
 
         #region Controllers
@@ -59,6 +61,13 @@ namespace NoodleProject.WebApi.Controllers
             try
             {
                 ApplicationUser creator = this.userRepository.GetOneById(model.UserId);
+                Topic t = this.topicRepository.GetOneById(model.ThreadId);
+
+                if(t.creator != creator && t.subscribers.Where(x => x.Id == creator.Id).Count() != 1 && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot add a post to a topic which you haven't created or are subbed to!");
+                }
+
                 repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = creator, Text = model.Text });
                 return Ok("Post Created");
             }
@@ -76,7 +85,15 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                repository.UpdateOne(new Post { ThreadID = model.ThreadId, Text = model.Text });
+                ApplicationUser creator = this.userRepository.GetOneById(model.UserId);
+                Post p = this.repository.GetOneById(model.PostId);
+
+                if (p.creator != creator && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot update a post which you did not create!");
+                }
+
+                repository.UpdateOne(new Post { ID = model.PostId, Text = model.Text });
                 return Ok("Post Updated");
             }
             catch
@@ -92,6 +109,14 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
+                Post p = this.repository.GetOneById(id);
+
+                if (p.creator != creator && !User.IsInRole("Admin"))
+                {
+                    return BadRequest("Cannot delete a post which you did not create!");
+                }
+
                 repository.DeleteOneById(id);
                 return Ok("Post Deleted");
             }

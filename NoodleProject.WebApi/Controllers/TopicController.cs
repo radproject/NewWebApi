@@ -73,7 +73,7 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId() && !User.IsInRole("Admin"));
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
 
                 if(user == null)
                 {

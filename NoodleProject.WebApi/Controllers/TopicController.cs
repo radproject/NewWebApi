@@ -160,12 +160,12 @@ namespace NoodleProject.WebApi.Controllers
                     return BadRequest("Bad Token! No User present!");
                 }
 
-                Topic topics = this.repository.GetOneById(TopicId);
-
+                Topic topic = this.repository.GetOneById(TopicId);
+                
                 //Check if permission to sub user or sub self if unspecified
-                if (UserId != null)
+                if (UserId != "none")
                 {
-                    if(topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                    if(topic.creator != user) //&& !User.IsInRole("Admin"))
                     {
                         return BadRequest("Cannot add a sub if you are not a creator of this topic!");
                     }
@@ -176,8 +176,10 @@ namespace NoodleProject.WebApi.Controllers
                 }
 
                 user = this.userRepository.GetOneById(UserId);
-                topics.subscribers.Add(user);
-                this.repository.UpdateOne(topics);
+                if (topic.subscribers == null)
+                { topic.subscribers = new List<ApplicationUser>(); }
+                topic.subscribers.Add(user);
+                this.repository.UpdateOne(topic);
                 return Ok();
             }
             catch (Exception e)
@@ -199,12 +201,12 @@ namespace NoodleProject.WebApi.Controllers
                     return BadRequest("Bad Token! No User present!");
                 }
 
-                Topic topics = this.repository.GetOneById(TopicId);
+                Topic topic = this.repository.GetOneById(TopicId);
 
                 //Check if permission to unsub user or unsub self if unspecified
-                if (UserId != null)
+                if (UserId != "none")
                 {
-                    if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                    if (topic.creator != this.userRepository.GetOneById(User.Identity.GetUserId())) // && !User.IsInRole("Admin"))
                     {
                         return BadRequest("Cannot remove a sub if you are not a creator of this topic!");
                     }
@@ -215,8 +217,10 @@ namespace NoodleProject.WebApi.Controllers
                 }
 
                 user = this.userRepository.GetOneById(UserId);
-                topics.subscribers.Remove(user);
-                this.repository.UpdateOne(topics);
+                if (topic.subscribers == null)
+                { topic.subscribers = new List<ApplicationUser>(); }
+                topic.subscribers.Remove(user);
+                this.repository.UpdateOne(topic);
                 return Ok();
             }
             catch (Exception e)

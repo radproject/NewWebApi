@@ -95,6 +95,7 @@ namespace NoodleProject.WebApi.Controllers
                 {
                     return BadRequest("Bad Token! No User present!");
                 }
+
                 repository.CreateOne(new Topic {Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creator = user, subscribers = new List<ApplicationUser>() { user }});
                 return Ok("Topic Created");
             }
@@ -172,7 +173,7 @@ namespace NoodleProject.WebApi.Controllers
                 //Else check if permission to add other users to sub
                 else
                 {
-                    if (topic.creator == user) //&& !User.IsInRole("Admin"))
+                    if (topic.creator == user || User.IsInRole("Admin"))
                     {
                         user = this.userRepository.GetOneById(UserId);
                         topic.subscribers.Add(user);
@@ -216,7 +217,7 @@ namespace NoodleProject.WebApi.Controllers
                 //Else check if permission to remove other users to sub
                 else
                 {
-                    if (topic.creator == user) //&& !User.IsInRole("Admin"))
+                    if (topic.creator == user || User.IsInRole("Admin"))
                     {
                         user = this.userRepository.GetOneById(UserId);
                         topic.subscribers.Remove(user);

@@ -346,7 +346,16 @@ namespace NoodleProject.WebApi.Controllers
             {   
                 return BadRequest("You cannot register for this website if you are not a member of IT Sligo!");
             }
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email };
+
+            if(model.StudentNumber != null)
+            {
+                if(!Regex.IsMatch(model.StudentNumber, @"(s|S)\d{8}"))
+                {
+                    return BadRequest("Invalid student number");
+                }
+            }
+            
+            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email, StudentNumber = model.StudentNumber };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 

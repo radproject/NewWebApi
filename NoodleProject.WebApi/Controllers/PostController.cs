@@ -60,16 +60,19 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                ApplicationUser creator = this.userRepository.GetOneById(model.UserId);
+                ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
                 Topic t = this.topicRepository.GetOneById(model.ThreadId);
 
-                if(t.creator != creator && t.subscribers.Where(x => x.Id == creator.Id).Count() != 1 && !User.IsInRole("Admin"))
+                //If the user is an admin, the creator or its public or its private and theyre a subscriber, post to topic
+                if(User.IsInRole("Admin") || (t.creator == creator) || t.isPrivate == false || (t.subscribers.Where(x => x.Id == creator.Id).Count() != 1))
                 {
-                    return BadRequest("Cannot add a post to a topic which you haven't created or are subbed to!");
+                    repository.CreateOne(new Post { ThreadID = model.ThreadId, Text = model.Text, creator = creator, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
+                    return Ok("Post Created");
                 }
-
-                repository.CreateOne(new Post { ThreadID = model.ThreadId, creator = creator, Text = model.Text });
-                return Ok("Post Created");
+                else
+                {
+                    return BadRequest("Cannot post to a topic unless you're an admin, it's creator or a subscriber");
+                }
             }
             catch
             {
@@ -85,16 +88,19 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                ApplicationUser creator = this.userRepository.GetOneById(model.UserId);
+                ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
                 Post p = this.repository.GetOneById(model.PostId);
 
-                if (p.creator != creator && !User.IsInRole("Admin"))
+                //If the user is an admin or the creator, update the post
+                if (User.IsInRole("Admin") || (p.creator == creator))
                 {
-                    return BadRequest("Cannot update a post which you did not create!");
+                    repository.UpdateOne(new Post { ID = model.PostId, Text = model.Text });
+                    return Ok("Post Updated");
                 }
-
-                repository.UpdateOne(new Post { ID = model.PostId, Text = model.Text });
-                return Ok("Post Updated");
+                else
+                {
+                    return BadRequest("Cannot update this post unless you are its creator or an admin");
+                }
             }
             catch
             {

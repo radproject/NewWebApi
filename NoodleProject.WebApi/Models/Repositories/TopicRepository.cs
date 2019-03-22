@@ -37,7 +37,12 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public IEnumerable<Topic> getAllForUserId(string UserId)
         {
-            return this.context.Topics.Where(x => x.creator.Id == UserId || x.subscribers.Where(y => y.Id == UserId).Count() == 1).ToList();
+            return this.context.Topics
+                .Where(t => (
+                    (t.creator.Id == UserId)
+                    ||
+                    ((t.subscribers.Where(s => (s.Id == UserId)).Count()) > 0)
+                )).ToList();
         }
 
         public Topic GetOneById(int id)

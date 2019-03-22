@@ -38,7 +38,15 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<Topic> GetById(int id)
         {
-            return null; //deprecated
+            try
+            {
+                Topic topic = this.repository.GetOneById(id);
+                return topic;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         [HttpGet]
@@ -46,8 +54,15 @@ namespace NoodleProject.WebApi.Controllers
         [Authorize]
         public async Task<IEnumerable<Topic>> GetAll()
         {
-            IEnumerable<Topic> topics = repository.getAll();
-            return topics;
+            try
+            {
+                IEnumerable<Topic> topics = repository.getAll();
+                return topics;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         [HttpGet]
@@ -80,7 +95,7 @@ namespace NoodleProject.WebApi.Controllers
                 {
                     return BadRequest("Bad Token! No User present!");
                 }
-                repository.CreateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creator = user, subscribers = new List<ApplicationUser>() { user }});
+                repository.CreateOne(new Topic {Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creator = user, subscribers = new List<ApplicationUser>() { user }});
                 return Ok("Topic Created");
             }
             catch
@@ -111,7 +126,7 @@ namespace NoodleProject.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("DeletePost")]
+        [Route("delete")]
         [Authorize]
         public async Task<IHttpActionResult> DeletePost(int id)
         {
@@ -133,7 +148,7 @@ namespace NoodleProject.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("AddSubscriberToPost")]
+        [Route("subscribe")]
         [Authorize]
         public async Task<IHttpActionResult> AddSub(int TopicId, string UserId)
         {
@@ -157,7 +172,7 @@ namespace NoodleProject.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("DeleteSubscriberFromAList")]
+        [Route("unsubscribe")]
         [Authorize]
         public async Task<IHttpActionResult> RemoveSub(int TopicId, string UserId)
         {

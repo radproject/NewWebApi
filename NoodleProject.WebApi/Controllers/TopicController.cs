@@ -162,25 +162,28 @@ namespace NoodleProject.WebApi.Controllers
 
                 Topic topic = this.repository.GetOneById(TopicId);
                 
-                //Check if permission to sub user or sub self if unspecified
-                if (UserId != "none")
+                //If userID is not specified then set it to your own ID
+                if (UserId == "none")
                 {
-                    if(topic.creator != user) //&& !User.IsInRole("Admin"))
-                    {
-                        return BadRequest("Cannot add a sub if you are not a creator of this topic!");
-                    }
+                    topic.subscribers.Add(user);
+                    this.repository.UpdateOne(topic);
+                    return Ok();
                 }
+                //Else check if permission to add other users to sub
                 else
                 {
-                    UserId = User.Identity.GetUserId();
+                    if (topic.creator == user) //&& !User.IsInRole("Admin"))
+                    {
+                        user = this.userRepository.GetOneById(UserId);
+                        topic.subscribers.Add(user);
+                        this.repository.UpdateOne(topic);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("Only topic creators and admins can add subscribers");
+                    }
                 }
-
-                user = this.userRepository.GetOneById(UserId);
-                if (topic.subscribers == null)
-                { topic.subscribers = new List<ApplicationUser>(); }
-                topic.subscribers.Add(user);
-                this.repository.UpdateOne(topic);
-                return Ok();
             }
             catch (Exception e)
             {
@@ -203,25 +206,28 @@ namespace NoodleProject.WebApi.Controllers
 
                 Topic topic = this.repository.GetOneById(TopicId);
 
-                //Check if permission to unsub user or unsub self if unspecified
-                if (UserId != "none")
+                //If userID is not specified then set it to your own ID
+                if (UserId == "none")
                 {
-                    if (topic.creator != this.userRepository.GetOneById(User.Identity.GetUserId())) // && !User.IsInRole("Admin"))
-                    {
-                        return BadRequest("Cannot remove a sub if you are not a creator of this topic!");
-                    }
+                    topic.subscribers.Add(user);
+                    this.repository.UpdateOne(topic);
+                    return Ok();
                 }
+                //Else check if permission to remove other users to sub
                 else
                 {
-                    UserId = User.Identity.GetUserId();
+                    if (topic.creator == user) //&& !User.IsInRole("Admin"))
+                    {
+                        user = this.userRepository.GetOneById(UserId);
+                        topic.subscribers.Remove(user);
+                        this.repository.UpdateOne(topic);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("Only topic creators and admins can add subscribers");
+                    }
                 }
-
-                user = this.userRepository.GetOneById(UserId);
-                if (topic.subscribers == null)
-                { topic.subscribers = new List<ApplicationUser>(); }
-                topic.subscribers.Remove(user);
-                this.repository.UpdateOne(topic);
-                return Ok();
             }
             catch (Exception e)
             {

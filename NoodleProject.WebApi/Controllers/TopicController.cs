@@ -154,14 +154,29 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                Topic topics = this.repository.GetOneById(TopicId);
-                if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
+                if (user == null)
                 {
-                    return BadRequest("Cannot add a sub if you are not a creator of this topic!");
+                    return BadRequest("Bad Token! No User present!");
                 }
-                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
 
-                topics.subscribers.Add(applicationUser);
+                Topic topics = this.repository.GetOneById(TopicId);
+
+                //Check if permission to sub user or sub self if unspecified
+                if (UserId != null)
+                {
+                    if(topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                    {
+                        return BadRequest("Cannot add a sub if you are not a creator of this topic!");
+                    }
+                }
+                else
+                {
+                    UserId = User.Identity.GetUserId();
+                }
+
+                user = this.userRepository.GetOneById(UserId);
+                topics.subscribers.Add(user);
                 this.repository.UpdateOne(topics);
                 return Ok();
             }
@@ -178,14 +193,29 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                Topic topics = this.repository.GetOneById(TopicId);
-                if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
+                if (user == null)
                 {
-                    return BadRequest("Cannot remove a sub if you are not a creator of this topic!");
+                    return BadRequest("Bad Token! No User present!");
                 }
 
-                ApplicationUser applicationUser = this.userRepository.GetOneById(UserId);
-                topics.subscribers.Remove(applicationUser);
+                Topic topics = this.repository.GetOneById(TopicId);
+
+                //Check if permission to unsub user or unsub self if unspecified
+                if (UserId != null)
+                {
+                    if (topics.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                    {
+                        return BadRequest("Cannot remove a sub if you are not a creator of this topic!");
+                    }
+                }
+                else
+                {
+                    UserId = User.Identity.GetUserId();
+                }
+
+                user = this.userRepository.GetOneById(UserId);
+                topics.subscribers.Remove(user);
                 this.repository.UpdateOne(topics);
                 return Ok();
             }

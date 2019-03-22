@@ -13,6 +13,7 @@ namespace NoodleProject.WebApi
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
+            app.MapSignalR(new Microsoft.AspNet.SignalR.HubConfiguration());
         }
     }
 }

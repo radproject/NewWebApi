@@ -1,4 +1,5 @@
-﻿using NoodleProject.WebApi.Models.Context;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using NoodleProject.WebApi.Models.Context;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Migrations;
@@ -9,11 +10,11 @@ namespace NoodleProject.WebApi.Models.Repositories
 {
     public class UserRepository : IRepository<ApplicationUser, string>
     {
-        ApplicationDbContext context;
+        IdentityDbContext<ApplicationUser> context;
 
-        public UserRepository()
+        public UserRepository(IdentityDbContext<ApplicationUser> context)
         {
-            this.context = new ApplicationDbContext();
+            this.context = context;
         }
         public ApplicationUser CreateOne(ApplicationUser parameters)
         {

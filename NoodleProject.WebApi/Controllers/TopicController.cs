@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.AspNet.Identity;
+using Microsoft.Ajax.Utilities;
+using NoodleProject.WebApi.Models.Posts;
 
 namespace NoodleProject.WebApi.Controllers
 {
@@ -20,28 +22,64 @@ namespace NoodleProject.WebApi.Controllers
         private ITopicRepository repository;
         private IRepository<ApplicationUser, string> userRepository;
 
-        public TopicController(ITopicRepository repository)
+        public TopicController(ITopicRepository repository, IRepository<ApplicationUser, string> userRepository)
         {
             this.repository = repository;
+            this.userRepository = userRepository;
         }
 
-        public TopicController()
-        {
-            ApplicationDbContext dbContext = new ApplicationDbContext();
-            this.repository = new TopicRepository(dbContext);
-            this.userRepository = new UserRepository();
-        }
+        public TopicController() { }
+
+        //public TopicController()
+        //{
+        //    ApplicationDbContext dbContext = new ApplicationDbContext();
+        //    this.repository = new TopicRepository(dbContext);
+        //    this.userRepository = new UserRepository();
+        //}
 
         #region Controllers
         [HttpGet]
         [Route("getbyid")]
-        [Authorize]
-        public async Task<Topic> GetById(int id)
+        //[Authorize]
+        public async Task<TopicViewModel> GetById(int id)
         {
             try
             {
                 Topic topic = this.repository.GetOneById(id);
-                return topic;
+                List<PostViewModel> posts = new List<PostViewModel>();
+                topic.posts.ForEach(post =>
+                {
+                    posts.Add(new PostViewModel()
+                    {
+                        ID = post.ID,
+                        Text = post.Text,
+                        ThreadID = post.ThreadID,
+                        TimeStamp = post.TimeStamp,
+                        creator = new IUserPostViewModel()
+                        {
+                            FirstName = post.creator.FirstName,
+                            LastName = post.creator.LastName,
+                            ID = post.creator.Id
+                        }
+                    });
+                });
+
+                return new TopicViewModel()
+                {
+                    CreationDate = topic.CreationDate,
+                    creator = new Models.PublicUserViewModel()
+                    {
+                        Email = topic.creator.Email,
+                        FirstName = topic.creator.FirstName,
+                        LastName = topic.creator.LastName,
+                        ID = topic.creator.Id,
+                        StudentID = topic.creator.StudentNumber
+                    },
+                    ID = topic.ID,
+                    isPrivate = topic.isPrivate,
+                    posts = posts,
+                    Title = topic.Title
+                };
             }
             catch
             {
@@ -52,12 +90,52 @@ namespace NoodleProject.WebApi.Controllers
         [HttpGet]
         [Route("getall")]
         [Authorize]
-        public async Task<IEnumerable<Topic>> GetAll()
+        public async Task<IEnumerable<TopicViewModel>> GetAll()
         {
             try
             {
                 IEnumerable<Topic> topics = repository.getAll();
-                return topics;
+
+                List<TopicViewModel> dtoTopics = new List<TopicViewModel>();
+                topics.ForEach(topic =>
+                {
+                    List<PostViewModel> posts = new List<PostViewModel>();
+                    topic.posts.ForEach(post =>
+                    {
+                        posts.Add(new PostViewModel()
+                        {
+                            ID = post.ID,
+                            Text = post.Text,
+                            ThreadID = post.ThreadID,
+                            TimeStamp = post.TimeStamp,
+                            creator = new IUserPostViewModel()
+                            {
+                                FirstName = post.creator.FirstName,
+                                LastName = post.creator.LastName,
+                                ID = post.creator.Id
+                            }
+                        });
+                    });
+
+                    TopicViewModel topicVM = new TopicViewModel()
+                    {
+                        CreationDate = topic.CreationDate,
+                        creator = new Models.PublicUserViewModel()
+                        {
+                            Email = topic.creator.Email,
+                            FirstName = topic.creator.FirstName,
+                            LastName = topic.creator.LastName,
+                            ID = topic.creator.Id,
+                            StudentID = topic.creator.StudentNumber
+                        },
+                        ID = topic.ID,
+                        posts = posts,
+                        isPrivate = topic.isPrivate,
+                        Title = topic.Title
+                    };
+                    dtoTopics.Add(topicVM);
+                });
+                return dtoTopics;
             }
             catch
             {
@@ -91,17 +169,17 @@ namespace NoodleProject.WebApi.Controllers
             {
                 ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
 
-                if(user == null)
+                if (user == null)
                 {
                     return BadRequest("Bad Token! No User present!");
                 }
 
-                repository.CreateOne(new Topic {Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creator = user, subscribers = new List<ApplicationUser>() { user }});
+                repository.CreateOne(new Topic { Title = model.Title, CreationDate = model.CreationDate, isPrivate = model.isPrivate, creatorId = user.Id });
                 return Ok("Topic Created");
             }
-            catch
+            catch (Exception e)
             {
-                return BadRequest("Bad Request");
+                return BadRequest(e.Message);
             }
         }
 
@@ -113,7 +191,7 @@ namespace NoodleProject.WebApi.Controllers
             try
             {
                 Topic t = this.repository.GetOneById(model.ID);
-                if(t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                if (t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
                 {
                     return BadRequest("Cannot update a Topic which you are not an admin of!");
                 }
@@ -162,7 +240,7 @@ namespace NoodleProject.WebApi.Controllers
                 }
 
                 Topic topic = this.repository.GetOneById(TopicId);
-                
+
                 //If userID is not specified then set it to your own ID
                 if (UserId == "none")
                 {

@@ -24,6 +24,8 @@ namespace NoodleProject.WebApi.Models.Db
         [ForeignKey("posts")]
         public int postId { get; set; }
         public ICollection<Post> posts { get; set; }
+        [ForeignKey("creator")]
+        public string creatorId { get; set; }
         public ApplicationUser creator { get; set; }
 
         public bool isPrivate { get; set; }

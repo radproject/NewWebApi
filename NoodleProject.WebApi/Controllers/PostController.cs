@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNet.Identity;
-using Ninject;
 using NoodleProject.WebApi.Models.Context;
 using NoodleProject.WebApi.Models.Db;
 using NoodleProject.WebApi.Models.Posts;
@@ -21,18 +20,21 @@ namespace NoodleProject.WebApi.Controllers
         public IRepository<ApplicationUser, string> userRepository { get; set; }
         public ITopicRepository topicRepository { get; set; }
 
-        public PostController(IPostRepository repository)
+        public PostController(IPostRepository repository, ITopicRepository topicRepository, IRepository<ApplicationUser, string> userRepository)
         {
             this.repository = repository;
+            this.topicRepository = topicRepository;
+            this.userRepository = userRepository;
         }
 
-        public PostController()
-        {
-            ApplicationDbContext dbContext = new ApplicationDbContext();
-            this.repository = new PostRepository(dbContext);
-            this.userRepository = new UserRepository();
-            this.topicRepository = new TopicRepository(dbContext);
-        }
+        public PostController() { }
+        //public PostController()
+        //{
+        //    ApplicationDbContext dbContext = new ApplicationDbContext();
+        //    this.repository = new PostRepository(dbContext);
+        //    this.userRepository = new UserRepository();
+        //    this.topicRepository = new TopicRepository(dbContext);
+        //}
 
         #region Controllers
         [HttpGet]
@@ -66,7 +68,7 @@ namespace NoodleProject.WebApi.Controllers
                 //If the user is an admin, the creator or its public or its private and theyre a subscriber, post to topic
                 if(User.IsInRole("Admin") || (t.creator == creator) || t.isPrivate == false || (t.subscribers.Where(x => x.Id == creator.Id).Count() != 1))
                 {
-                    repository.CreateOne(new Post { ThreadID = model.ThreadId, Text = model.Text, creator = creator, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
+                    repository.CreateOne(new Post() { ThreadID = model.ThreadId, Text = model.Text, creator = creator, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
                     return Ok("Post Created");
                 }
                 else

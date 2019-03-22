@@ -18,9 +18,9 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Post CreateOne(Post parameters)
         {
-            Post post = this.context.Posts.Add(parameters);
+            this.context.Posts.Add(parameters);
             this.context.SaveChanges();
-            return post;
+            return parameters;
         }
 
         public void DeleteOneById(int id)
@@ -51,6 +51,6 @@ namespace NoodleProject.WebApi.Models.Repositories
             this.context.SaveChanges();
             return parameters;
         }
-        
+
     }
 }

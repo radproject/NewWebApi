@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -16,6 +17,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OAuth;
 using NoodleProject.WebApi.Models;
 using NoodleProject.WebApi.Models.Context;
+using NoodleProject.WebApi.Models.Repositories;
 using NoodleProject.WebApi.Providers;
 using NoodleProject.WebApi.Results;
 
@@ -27,9 +29,14 @@ namespace NoodleProject.WebApi.Controllers
     {
         private const string LocalLoginProvider = "Local";
         private ApplicationUserManager _userManager;
-
+        IRepository<ApplicationUser, string> userRepository;
         public AccountController()
         {
+        }
+
+        public AccountController(IRepository<ApplicationUser, string> userRepository)
+        {
+            this.userRepository = userRepository;
         }
 
         public AccountController(ApplicationUserManager userManager,
@@ -85,6 +92,33 @@ namespace NoodleProject.WebApi.Controllers
             ApplicationUser au = this.UserManager.FindById(id);
 
             return au;
+        }
+
+        [Route("GetUsers")]
+        [Authorize]
+        public IEnumerable<PublicUserViewModel> GetUsers(string searchParam)
+        {
+            ICollection<ApplicationUser> users = this.userRepository.getAll();
+            List<PublicUserViewModel> goodUsers = new List<PublicUserViewModel>();
+
+            users.ForEach(user =>
+            {
+                string fullName = string.Format("{0} {1}", user.FirstName, user.LastName).ToLower();
+                
+                if(fullName.Contains(searchParam.ToLower()))
+                {
+                    goodUsers.Add(new PublicUserViewModel()
+                    {
+                        ID = user.Id,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName, 
+                        StudentID = user.StudentNumber
+                    });
+                }
+            });
+
+            return goodUsers;            
         }
 
 

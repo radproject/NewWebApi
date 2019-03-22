@@ -18,7 +18,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Topic CreateOne(Topic parameters)
         {
-            Topic topic = this.context.Topics.Add(parameters);
+            this.context.Topics.Add(parameters);
             this.context.SaveChanges();
             return parameters;
         }
@@ -49,6 +49,7 @@ namespace NoodleProject.WebApi.Models.Repositories
         {
             Topic tempTopic = this.context.Topics.Where(t => t.ID == id).SingleOrDefault();
             tempTopic.posts = this.context.Posts.Where(p => p.ThreadID == id).ToArray();
+            tempTopic.creator = this.context.Users.Where(u => u.Id == tempTopic.creatorId).SingleOrDefault();
             return tempTopic;
         }
 

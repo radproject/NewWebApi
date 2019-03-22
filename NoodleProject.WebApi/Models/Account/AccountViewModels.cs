@@ -40,4 +40,13 @@ namespace NoodleProject.WebApi.Models
 
         public string ProviderKey { get; set; }
     }
+
+    public class PublicUserViewModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string ID { get; set; }
+        public string StudentID { get; set; }
+    }
 }

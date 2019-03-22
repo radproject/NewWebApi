@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NoodleProject.WebApi.Models.Db;
+using NoodleProject.WebApi.Models.Posts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,8 +13,8 @@ namespace NoodleProject.WebApi.Models.Topics
         public string Title { get; set; }
         public DateTime CreationDate { get; set; }
 
-        public int PostId { get; set; }
-        public string CreatorId { get; set; }
+        public IEnumerable<PostViewModel> posts { get; set; }
+        public PublicUserViewModel creator { get; set; }
         public bool isPrivate { get; set; }
     }
 }

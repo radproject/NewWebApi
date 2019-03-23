@@ -104,14 +104,14 @@ namespace NoodleProject.WebApi.Controllers
             users.ForEach(user =>
             {
                 
-                if(user.FullName.Contains(searchParam.ToLower()))
+                if(user.FullName.ToLower().Contains(searchParam.ToLower()))
                 {
                     goodUsers.Add(new PublicUserViewModel()
                     {
                         Id = user.Id,
                         Email = user.Email,
                         FullName = user.FullName,
-                        StudentID = user.StudentNumber
+                        StudentId = user.StudentNumber
                     });
                 }
             });

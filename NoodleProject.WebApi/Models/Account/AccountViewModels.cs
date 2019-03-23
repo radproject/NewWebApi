@@ -46,6 +46,6 @@ namespace NoodleProject.WebApi.Models
         public string FullName { get; set; }
         public string Email { get; set; }
         public string Id { get; set; }
-        public string StudentID { get; set; }
+        public string StudentId { get; set; }
     }
 }

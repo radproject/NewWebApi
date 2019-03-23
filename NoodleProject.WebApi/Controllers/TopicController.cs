@@ -74,7 +74,8 @@ namespace NoodleProject.WebApi.Controllers
                             postVM.creator = new IUserPostViewModel()
                             {
                                 Id = tempuser.Id,
-                                FullName = tempuser.FullName
+                                FullName = tempuser.FullName,
+                                StudentId = tempuser.StudentNumber
                             };
                         }
 
@@ -102,7 +103,7 @@ namespace NoodleProject.WebApi.Controllers
                         Email = topic.creator.Email,
                         FullName = topic.creator.FullName,
                         Id = topic.creator.Id,
-                        StudentID = topic.creator.StudentNumber
+                        StudentId = topic.creator.StudentNumber
                     };
                 }
 
@@ -143,7 +144,7 @@ namespace NoodleProject.WebApi.Controllers
                             FullName = tempUser.FullName,
                             Email = tempUser.Email,
                             Id = tempUser.Id,
-                            StudentID = tempUser.StudentNumber
+                            StudentId = tempUser.StudentNumber
                         };
                     }
                     else
@@ -164,13 +165,43 @@ namespace NoodleProject.WebApi.Controllers
         [HttpGet]
         [Route("getsubscribedtopics")]
         [Authorize]
-        public async Task<IEnumerable<Topic>> GetAllByUserId(string UserId)
+        public async Task<IEnumerable<TopicViewModel>> GetAllByUserId(string UserId)
         {
             try
             {
-                IEnumerable<Topic> topicData = this.repository.getAllForUserId(UserId);
+                IEnumerable<Topic> topics = repository.getAllForUserId(UserId);
 
-                return topicData;
+                List<TopicViewModel> dtoTopics = new List<TopicViewModel>();
+                topics.ForEach(topic =>
+                {
+                    TopicViewModel topicVM = new TopicViewModel()
+                    {
+                        CreationDate = topic.CreationDate,
+                        Id = topic.Id,
+                        posts = null,
+                        isPrivate = topic.isPrivate,
+                        Title = topic.Title
+                    };
+
+                    ApplicationUser tempUser = this.userRepository.GetOneById(topic.creatorId);
+                    if (tempUser != null)
+                    {
+                        topicVM.creator = new PublicUserViewModel()
+                        {
+                            FullName = tempUser.FullName,
+                            Email = tempUser.Email,
+                            Id = tempUser.Id,
+                            StudentId = tempUser.StudentNumber
+                        };
+                    }
+                    else
+                    {
+                        topicVM.creator = null;
+                    }
+
+                    dtoTopics.Add(topicVM);
+                });
+                return dtoTopics;
             }
             catch
             {

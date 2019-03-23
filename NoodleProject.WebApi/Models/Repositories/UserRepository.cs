@@ -30,7 +30,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public ICollection<ApplicationUser> getAll()
         {
-            return null;
+            return this.context.Users.ToList();
         }
 
         public ApplicationUser GetOneById(string id)

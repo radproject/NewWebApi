@@ -18,5 +18,6 @@ namespace NoodleProject.WebApi.Models.Posts
     {
         public string Id { get; set; }
         public string FullName { get; set; }
+        public string StudentId { get; set; }
     }
 }

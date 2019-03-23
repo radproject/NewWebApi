@@ -23,7 +23,8 @@ namespace NoodleProject.WebApi.Models.Repositories
                 ThreadID = parameters.ThreadID,
                 Text = parameters.Text,
                 TimeStamp = parameters.TimeStamp,
-                creator = parameters.creator
+                creator = parameters.creator,
+                CreatorId = parameters.CreatorId
             });
             this.context.SaveChanges();
             return parameters;

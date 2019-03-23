@@ -12,6 +12,7 @@ using System.Web.Http;
 using Microsoft.AspNet.Identity;
 using Microsoft.Ajax.Utilities;
 using NoodleProject.WebApi.Models.Posts;
+using NoodleProject.WebApi.Models;
 
 namespace NoodleProject.WebApi.Controllers
 {
@@ -63,7 +64,8 @@ namespace NoodleProject.WebApi.Controllers
                             TimeStamp = post.TimeStamp
                         };
 
-                        if (post.creator == null)
+                        ApplicationUser tempuser = this.userRepository.GetOneById(post.CreatorId);
+                        if (tempuser == null)
                         {
                             postVM.creator = null;
                         }
@@ -71,9 +73,8 @@ namespace NoodleProject.WebApi.Controllers
                         {
                             postVM.creator = new IUserPostViewModel()
                             {
-                                FirstName = post.creator.FirstName,
-                                LastName = post.creator.LastName,
-                                Id = post.creator.Id
+                                Id = tempuser.Id,
+                                FullName = tempuser.FullName
                             };
                         }
 
@@ -99,8 +100,7 @@ namespace NoodleProject.WebApi.Controllers
                     topicVM.creator = new Models.PublicUserViewModel()
                     {
                         Email = topic.creator.Email,
-                        FirstName = topic.creator.FirstName,
-                        LastName = topic.creator.LastName,
+                        FullName = topic.creator.FullName,
                         Id = topic.creator.Id,
                         StudentID = topic.creator.StudentNumber
                     };
@@ -126,55 +126,31 @@ namespace NoodleProject.WebApi.Controllers
                 List<TopicViewModel> dtoTopics = new List<TopicViewModel>();
                 topics.ForEach(topic =>
                 {
-                    List<PostViewModel> posts = new List<PostViewModel>();
-                    if(topic.posts == null)
-                    {
-                        posts = null;
-                    }
-                    else
-                    {
-                        topic.posts.ForEach(post =>
-                        {
-                            posts.Add(new PostViewModel()
-                            {
-                                Id = post.Id,
-                                Text = post.Text,
-                                ThreadID = post.ThreadID,
-                                TimeStamp = post.TimeStamp,
-                                creator = new IUserPostViewModel()
-                                {
-                                    FirstName = post.creator.FirstName,
-                                    LastName = post.creator.LastName,
-                                    Id = post.creator.Id
-                                }
-                            });
-                        });
-                    }
-
                     TopicViewModel topicVM = new TopicViewModel()
                     {
                         CreationDate = topic.CreationDate,
                         Id = topic.Id,
-                        posts = posts,
+                        posts = null,
                         isPrivate = topic.isPrivate,
                         Title = topic.Title
                     };
 
-                    if (topic.creator == null)
+                    ApplicationUser tempUser = this.userRepository.GetOneById(topic.creatorId);
+                    if(tempUser != null)
                     {
-                        topicVM.creator = null;
+                        topicVM.creator = new PublicUserViewModel()
+                        {
+                            FullName = tempUser.FullName,
+                            Email = tempUser.Email,
+                            Id = tempUser.Id,
+                            StudentID = tempUser.StudentNumber
+                        };
                     }
                     else
                     {
-                        topicVM.creator = new Models.PublicUserViewModel()
-                        {
-                            Email = topic.creator.Email,
-                            FirstName = topic.creator.FirstName,
-                            LastName = topic.creator.LastName,
-                            Id = topic.creator.Id,
-                            StudentID = topic.creator.StudentNumber
-                        };
+                        topicVM.creator = null;
                     }
+
                     dtoTopics.Add(topicVM);
                 });
                 return dtoTopics;

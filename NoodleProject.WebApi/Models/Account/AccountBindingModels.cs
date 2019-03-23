@@ -51,6 +51,10 @@ namespace NoodleProject.WebApi.Models
         
         [Display(Name ="Student Number")]
         public string StudentNumber { get; set; }
+
+        [Required]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; }
     }
 
     public class RegisterExternalBindingModel

@@ -103,16 +103,14 @@ namespace NoodleProject.WebApi.Controllers
 
             users.ForEach(user =>
             {
-                string fullName = string.Format("{0} {1}", user.FirstName, user.LastName).ToLower();
                 
-                if(fullName.Contains(searchParam.ToLower()))
+                if(user.FullName.Contains(searchParam.ToLower()))
                 {
                     goodUsers.Add(new PublicUserViewModel()
                     {
                         Id = user.Id,
                         Email = user.Email,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName, 
+                        FullName = user.FullName,
                         StudentID = user.StudentNumber
                     });
                 }
@@ -389,7 +387,7 @@ namespace NoodleProject.WebApi.Controllers
                 }
             }
             
-            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email, StudentNumber = model.StudentNumber };
+            var user = new ApplicationUser() { UserName = model.Email, Email = model.Email, StudentNumber = model.StudentNumber, FullName = model.FullName };
 
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
 

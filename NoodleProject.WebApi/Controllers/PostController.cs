@@ -52,6 +52,10 @@ namespace NoodleProject.WebApi.Controllers
         public async Task<IEnumerable<Post>> GetAllForThread(int ThreadId)
         {
             IEnumerable<Post> posts = this.repository.getAllByThreadId(ThreadId);
+            foreach(Post p in posts)
+            {
+                p.creator = this.userRepository.GetOneById(p.CreatorId);
+            }
             return posts;
         }
 
@@ -65,8 +69,12 @@ namespace NoodleProject.WebApi.Controllers
                 ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
                 Topic t = this.topicRepository.GetOneById(model.ThreadId);
 
+                if (creator == null)
+                {
+                    return BadRequest("Bad token or user does not exist");
+                }
                 //If the user is an admin, the creator or its public or its private and theyre a subscriber, post to topic
-                if(User.IsInRole("Admin") || (t.creator == creator) || t.isPrivate == false || (t.subscribers.Where(x => x.Id == creator.Id).Count() != 1))
+                if (User.IsInRole("Admin") || (t.creator == creator) || t.isPrivate == false || (t.subscribers.Where(x => x.Id == creator.Id).Count() != 1))
                 {
                     repository.CreateOne(new Post() { ThreadID = model.ThreadId, Text = model.Text, CreatorId = creator.Id, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
                     return Ok("Post Created");
@@ -93,6 +101,10 @@ namespace NoodleProject.WebApi.Controllers
                 ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
                 Post p = this.repository.GetOneById(model.PostId);
 
+                if (creator == null)
+                {
+                    return BadRequest("Bad token or user does not exist");
+                }
                 //If the user is an admin or the creator, update the post
                 if (User.IsInRole("Admin") || (p.creator == creator))
                 {
@@ -120,13 +132,15 @@ namespace NoodleProject.WebApi.Controllers
                 ApplicationUser creator = this.userRepository.GetOneById(User.Identity.GetUserId());
                 Post p = this.repository.GetOneById(id);
 
-                if (p.creator != creator && !User.IsInRole("Admin"))
+                if (p.CreatorId == creator.Id || !User.IsInRole("Admin"))
+                {
+                    repository.DeleteOneById(id);
+                    return Ok("Post Deleted");
+                }
+                else
                 {
                     return BadRequest("Cannot delete a post which you did not create!");
                 }
-
-                repository.DeleteOneById(id);
-                return Ok("Post Deleted");
             }
             catch
             {

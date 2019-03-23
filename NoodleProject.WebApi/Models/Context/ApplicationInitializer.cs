@@ -44,8 +44,7 @@ namespace NoodleProject.WebApi.Models.Context
 
             ApplicationUser admin = new ApplicationUser()
             {
-                FirstName = "noodle",
-                LastName = "admin",
+                FullName = "noodle admin",
                 Email = "admin@noodle.com",
                 UserName = "admin@noodle.com",
                 PasswordHash = ps.HashPassword("administrator$1"),
@@ -57,8 +56,7 @@ namespace NoodleProject.WebApi.Models.Context
 
             ApplicationUser Lecturer = new ApplicationUser()
             {
-                FirstName = "Paul",
-                LastName = "Pawell",
+                FullName = "Paul Pawell",
                 Email = "PaulP@noodle.com",
                 UserName = "PaulPnoodle.com",
                 PasswordHash = ps.HashPassword("Paul2019"),
@@ -72,8 +70,7 @@ namespace NoodleProject.WebApi.Models.Context
 
             ApplicationUser Student = new ApplicationUser()
             {
-                FirstName = "Karolis",
-                LastName = "Gunka",
+                FullName = "Karolis Gunka",
                 Email = "karolis.gunka@mail.itlsigo.ie",
                 UserName = "karolis.gunka@mail.itlsigo.ie",
                 PasswordHash = ps.HashPassword("Gunka2019"),
@@ -86,8 +83,7 @@ namespace NoodleProject.WebApi.Models.Context
 
             ApplicationUser Student1 = new ApplicationUser()
             {
-                FirstName = "Alan",
-                LastName = "Jachimczak",
+                FullName = "Alan Jachimczak",
                 Email = "Alan.Jackimczak@mail.itlsigo.ie",
                 UserName = "Alan.Jackimczak@mail.itlsigo.ie",
                 PasswordHash = ps.HashPassword("Alan2019"),

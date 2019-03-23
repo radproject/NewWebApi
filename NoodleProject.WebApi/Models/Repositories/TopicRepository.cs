@@ -48,7 +48,7 @@ namespace NoodleProject.WebApi.Models.Repositories
         public Topic GetOneById(int id)
         {
             Topic tempTopic = this.context.Topics.Where(t => t.ID == id).SingleOrDefault();
-            tempTopic.posts = this.context.Posts.Where(p => p.ThreadID == id).ToArray();
+            tempTopic.posts = this.context.Posts.Where(p => p.ThreadID == id).ToList();
             tempTopic.creator = this.context.Users.Where(u => u.Id == tempTopic.creatorId).SingleOrDefault();
             return tempTopic;
         }

@@ -68,7 +68,7 @@ namespace NoodleProject.WebApi.Controllers
                 //If the user is an admin, the creator or its public or its private and theyre a subscriber, post to topic
                 if(User.IsInRole("Admin") || (t.creator == creator) || t.isPrivate == false || (t.subscribers.Where(x => x.Id == creator.Id).Count() != 1))
                 {
-                    repository.CreateOne(new Post() { ThreadID = model.ThreadId, Text = model.Text, creator = creator, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
+                    repository.CreateOne(new Post() { ThreadID = model.ThreadId, Text = model.Text, CreatorId = creator.Id, TimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
                     return Ok("Post Created");
                 }
                 else

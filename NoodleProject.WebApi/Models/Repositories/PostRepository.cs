@@ -18,7 +18,13 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Post CreateOne(Post parameters)
         {
-            this.context.Posts.Add(parameters);
+            this.context.Posts.Add(new Post()
+            {
+                ThreadID = parameters.ThreadID,
+                Text = parameters.Text,
+                TimeStamp = parameters.TimeStamp,
+                creator = parameters.creator
+            });
             this.context.SaveChanges();
             return parameters;
         }

@@ -22,6 +22,9 @@ namespace NoodleProject.WebApi.Models.Db
         public int ThreadID { get; set; }
         public Topic associatedThread { get; set; }
 
+        [ForeignKey("creator")]
+        public string CreatorId { get; set; }
+
         public ApplicationUser creator { get; set; }
     }
 }

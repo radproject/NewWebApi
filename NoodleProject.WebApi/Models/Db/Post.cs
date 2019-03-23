@@ -12,7 +12,7 @@ namespace NoodleProject.WebApi.Models.Db
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ID { get; set; }
+        public int Id { get; set; }
         [Display(Name = "Text")]
         public string Text { get; set; }
         [Display(Name = "Time stamp")]

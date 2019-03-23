@@ -47,39 +47,66 @@ namespace NoodleProject.WebApi.Controllers
             {
                 Topic topic = this.repository.GetOneById(id);
                 List<PostViewModel> posts = new List<PostViewModel>();
-                topic.posts.ForEach(post =>
+                if(topic.posts == null)
                 {
-                    posts.Add(new PostViewModel()
+                    posts = null;
+                }
+                else
+                {
+                    topic.posts.ForEach(post =>
                     {
-                        ID = post.ID,
-                        Text = post.Text,
-                        ThreadID = post.ThreadID,
-                        TimeStamp = post.TimeStamp,
-                        creator = new IUserPostViewModel()
+                        PostViewModel postVM = new PostViewModel()
                         {
-                            FirstName = post.creator.FirstName,
-                            LastName = post.creator.LastName,
-                            ID = post.creator.Id
-                        }
-                    });
-                });
+                            Id = post.Id,
+                            Text = post.Text,
+                            ThreadID = post.ThreadID,
+                            TimeStamp = post.TimeStamp
+                        };
 
-                return new TopicViewModel()
+                        if (post.creator == null)
+                        {
+                            postVM.creator = null;
+                        }
+                        else
+                        {
+                            postVM.creator = new IUserPostViewModel()
+                            {
+                                FirstName = post.creator.FirstName,
+                                LastName = post.creator.LastName,
+                                Id = post.creator.Id
+                            };
+                        }
+
+                        posts.Add(postVM);
+                    });
+                }
+
+                TopicViewModel topicVM = new TopicViewModel()
                 {
                     CreationDate = topic.CreationDate,
-                    creator = new Models.PublicUserViewModel()
-                    {
-                        Email = topic.creator.Email,
-                        FirstName = topic.creator.FirstName,
-                        LastName = topic.creator.LastName,
-                        ID = topic.creator.Id,
-                        StudentID = topic.creator.StudentNumber
-                    },
-                    ID = topic.ID,
+                    Id = topic.Id,
                     isPrivate = topic.isPrivate,
                     posts = posts,
                     Title = topic.Title
                 };
+
+                if(topic.creator == null)
+                {
+                    topicVM.creator = null;
+                }
+                else
+                {
+                    topicVM.creator = new Models.PublicUserViewModel()
+                    {
+                        Email = topic.creator.Email,
+                        FirstName = topic.creator.FirstName,
+                        LastName = topic.creator.LastName,
+                        Id = topic.creator.Id,
+                        StudentID = topic.creator.StudentNumber
+                    };
+                }
+
+                return topicVM;
             }
             catch
             {
@@ -110,7 +137,7 @@ namespace NoodleProject.WebApi.Controllers
                         {
                             posts.Add(new PostViewModel()
                             {
-                                ID = post.ID,
+                                Id = post.Id,
                                 Text = post.Text,
                                 ThreadID = post.ThreadID,
                                 TimeStamp = post.TimeStamp,
@@ -118,7 +145,7 @@ namespace NoodleProject.WebApi.Controllers
                                 {
                                     FirstName = post.creator.FirstName,
                                     LastName = post.creator.LastName,
-                                    ID = post.creator.Id
+                                    Id = post.creator.Id
                                 }
                             });
                         });
@@ -127,7 +154,7 @@ namespace NoodleProject.WebApi.Controllers
                     TopicViewModel topicVM = new TopicViewModel()
                     {
                         CreationDate = topic.CreationDate,
-                        ID = topic.ID,
+                        Id = topic.Id,
                         posts = posts,
                         isPrivate = topic.isPrivate,
                         Title = topic.Title
@@ -144,7 +171,7 @@ namespace NoodleProject.WebApi.Controllers
                             Email = topic.creator.Email,
                             FirstName = topic.creator.FirstName,
                             LastName = topic.creator.LastName,
-                            ID = topic.creator.Id,
+                            Id = topic.creator.Id,
                             StudentID = topic.creator.StudentNumber
                         };
                     }
@@ -205,12 +232,12 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
-                Topic t = this.repository.GetOneById(model.ID);
+                Topic t = this.repository.GetOneById(model.Id);
                 if (t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
                 {
                     return BadRequest("Cannot update a Topic which you are not an admin of!");
                 }
-                repository.UpdateOne(new Topic { ID = model.ID, Title = model.Title, CreationDate = model.CreationDate });
+                repository.UpdateOne(new Topic { Id = model.Id, Title = model.Title, CreationDate = model.CreationDate });
                 return Ok("Topic Updated");
             }
             catch

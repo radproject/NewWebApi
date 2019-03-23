@@ -109,7 +109,7 @@ namespace NoodleProject.WebApi.Controllers
                 {
                     goodUsers.Add(new PublicUserViewModel()
                     {
-                        ID = user.Id,
+                        Id = user.Id,
                         Email = user.Email,
                         FirstName = user.FirstName,
                         LastName = user.LastName, 

@@ -96,7 +96,7 @@ namespace NoodleProject.WebApi.Controllers
                 //If the user is an admin or the creator, update the post
                 if (User.IsInRole("Admin") || (p.creator == creator))
                 {
-                    repository.UpdateOne(new Post { ID = model.PostId, Text = model.Text });
+                    repository.UpdateOne(new Post { Id = model.PostId, Text = model.Text });
                     return Ok("Post Updated");
                 }
                 else

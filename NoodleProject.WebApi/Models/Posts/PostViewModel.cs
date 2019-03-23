@@ -7,7 +7,7 @@ namespace NoodleProject.WebApi.Models.Posts
 {
     public class PostViewModel
     {
-        public int ID { get; set; }
+        public int Id { get; set; }
         public string Text { get; set; }
         public long TimeStamp { get; set; }
         public int ThreadID { get; set; }
@@ -16,7 +16,7 @@ namespace NoodleProject.WebApi.Models.Posts
 
     public class IUserPostViewModel
     {
-        public string ID { get; set; }
+        public string Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
     }

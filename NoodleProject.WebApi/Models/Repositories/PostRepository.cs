@@ -31,7 +31,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public void DeleteOneById(int id)
         {
-            Post post = this.context.Posts.Where(x => x.ID == id).SingleOrDefault();
+            Post post = this.context.Posts.Where(x => x.Id == id).SingleOrDefault();
             this.context.Posts.Remove(post);
             this.context.SaveChanges();
         }
@@ -48,12 +48,12 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Post GetOneById(int id)
         {
-            return this.context.Posts.Where(x => x.ID == id).SingleOrDefault();
+            return this.context.Posts.Where(x => x.Id == id).SingleOrDefault();
         }
 
         public Post UpdateOne(Post parameters)
         {
-            this.context.Posts.AddOrUpdate(x => x.ID, parameters);
+            this.context.Posts.AddOrUpdate(x => x.Id, parameters);
             this.context.SaveChanges();
             return parameters;
         }

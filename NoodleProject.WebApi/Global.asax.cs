@@ -47,10 +47,10 @@ namespace NoodleProject.WebApi
         private static void RegisterServices(IKernel kernel)
         {
             // This is where we tell Ninject how to resolve service requests
-            kernel.Bind<IdentityDbContext<ApplicationUser>>().To<ApplicationDbContext>();
-            kernel.Bind<ITopicRepository>().To<TopicRepository>();
-            kernel.Bind<IPostRepository>().To<PostRepository>();
-            kernel.Bind<IRepository<ApplicationUser, string>>().To<UserRepository>();
+            kernel.Bind<ApplicationDbContext>().ToSelf().InRequestScope();
+            kernel.Bind<ITopicRepository>().To<TopicRepository>().InRequestScope();
+            kernel.Bind<IPostRepository>().To<PostRepository>().InRequestScope();
+            kernel.Bind<IRepository<ApplicationUser, string>>().To<UserRepository>().InRequestScope();
         }
 
     }

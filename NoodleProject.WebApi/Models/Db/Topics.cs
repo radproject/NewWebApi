@@ -19,6 +19,8 @@ namespace NoodleProject.WebApi.Models.Db
         [DisplayFormat(DataFormatString = "{0:dd-MMM-yy}", ApplyFormatInEditMode = true)]
         public DateTime CreationDate { get; set; }
 
+        [ForeignKey("subscribers")]
+        public string SubscriberId { get; set; }
         public ICollection<ApplicationUser> subscribers { get; set; }
 
         [ForeignKey("posts")]

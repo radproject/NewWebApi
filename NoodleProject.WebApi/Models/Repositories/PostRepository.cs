@@ -10,7 +10,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 {
     public class PostRepository : IPostRepository
     {
-        ApplicationDbContext context = new ApplicationDbContext();
+        ApplicationDbContext context;
         public PostRepository(ApplicationDbContext context)
         {
             this.context = context;

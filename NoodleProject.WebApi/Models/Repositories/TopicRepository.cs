@@ -10,7 +10,7 @@ namespace NoodleProject.WebApi.Models.Repositories
 {
     public class TopicRepository :ITopicRepository
     {
-        ApplicationDbContext context = new ApplicationDbContext();
+        ApplicationDbContext context;
         public TopicRepository(ApplicationDbContext context)
         {
             this.context = context;
@@ -55,7 +55,8 @@ namespace NoodleProject.WebApi.Models.Repositories
 
         public Topic UpdateOne(Topic parameters)
         {
-            this.context.Topics.AddOrUpdate(t => t.Id, parameters);
+            Topic original = this.context.Topics.Where(x => x.Id == parameters.Id).SingleOrDefault();
+            this.context.Entry(original).CurrentValues.SetValues(parameters);
             this.context.SaveChanges();
             return parameters;
         }

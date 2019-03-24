@@ -10,9 +10,9 @@ namespace NoodleProject.WebApi.Models.Repositories
 {
     public class UserRepository : IRepository<ApplicationUser, string>
     {
-        IdentityDbContext<ApplicationUser> context;
+        ApplicationDbContext context;
 
-        public UserRepository(IdentityDbContext<ApplicationUser> context)
+        public UserRepository(ApplicationDbContext context)
         {
             this.context = context;
         }

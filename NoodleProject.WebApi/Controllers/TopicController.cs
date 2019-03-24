@@ -169,6 +169,11 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
+                if(user == null)
+                {
+                    return null;
+                }
                 IEnumerable<Topic> topics = repository.getAllForUserId(UserId);
 
                 List<TopicViewModel> dtoTopics = new List<TopicViewModel>();
@@ -239,13 +244,19 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
+
                 Topic t = this.repository.GetOneById(model.Id);
-                if (t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+
+                if (t.creatorId == user.Id || User.IsInRole("Admin"))
+                {
+                    repository.UpdateOne(new Topic { Id = model.Id, Title = model.Title, CreationDate = model.CreationDate });
+                    return Ok("Topic Updated");
+                }
+                else
                 {
                     return BadRequest("Cannot update a Topic which you are not an admin of!");
                 }
-                repository.UpdateOne(new Topic { Id = model.Id, Title = model.Title, CreationDate = model.CreationDate });
-                return Ok("Topic Updated");
             }
             catch
             {
@@ -260,14 +271,22 @@ namespace NoodleProject.WebApi.Controllers
         {
             try
             {
+                ApplicationUser user = this.userRepository.GetOneById(User.Identity.GetUserId());
+                if(user == null)
+                {
+                    return BadRequest("Invalid Token");
+                }
+
                 Topic t = this.repository.GetOneById(id);
-                if (t.creator != this.userRepository.GetOneById(User.Identity.GetUserId()) && !User.IsInRole("Admin"))
+                if (t.creatorId == user.Id || User.IsInRole("Admin"))
+                {
+                    repository.DeleteOneById(id);
+                    return Ok("Topic Deleted");
+                }
+                else
                 {
                     return BadRequest("Cannot delete a Topic which you are not an admin of!");
                 }
-
-                repository.DeleteOneById(id);
-                return Ok("Topic Deleted");
             }
             catch
             {
@@ -290,27 +309,24 @@ namespace NoodleProject.WebApi.Controllers
 
                 Topic topic = this.repository.GetOneById(TopicId);
 
-                //If userID is not specified then set it to your own ID
-                if (UserId == "none")
+                //If user is creator, admin or the user they're adding
+                if (topic.creatorId == user.Id || User.IsInRole("Admin") || UserId == user.Id)
                 {
-                    topic.subscribers.Add(user);
-                    this.repository.UpdateOne(topic);
-                    return Ok();
-                }
-                //Else check if permission to add other users to sub
-                else
-                {
-                    if (topic.creator == user || User.IsInRole("Admin"))
+                    user = this.userRepository.GetOneById(UserId);
+                    if (user != null)
                     {
-                        user = this.userRepository.GetOneById(UserId);
                         topic.subscribers.Add(user);
                         this.repository.UpdateOne(topic);
                         return Ok();
                     }
                     else
                     {
-                        return BadRequest("Only topic creators and admins can add subscribers");
+                        return BadRequest("User not found");
                     }
+                }
+                else
+                {
+                    return BadRequest("Only topic creators and admins can add subscribers");
                 }
             }
             catch (Exception e)
@@ -334,27 +350,24 @@ namespace NoodleProject.WebApi.Controllers
 
                 Topic topic = this.repository.GetOneById(TopicId);
 
-                //If userID is not specified then set it to your own ID
-                if (UserId == "none")
+                //If user is creator, admin or the user they're adding
+                if (topic.creatorId == user.Id || User.IsInRole("Admin") || UserId == user.Id)
                 {
-                    topic.subscribers.Add(user);
-                    this.repository.UpdateOne(topic);
-                    return Ok();
-                }
-                //Else check if permission to remove other users to sub
-                else
-                {
-                    if (topic.creator == user || User.IsInRole("Admin"))
+                    user = this.userRepository.GetOneById(UserId);
+                    if (user != null)
                     {
-                        user = this.userRepository.GetOneById(UserId);
                         topic.subscribers.Remove(user);
                         this.repository.UpdateOne(topic);
                         return Ok();
                     }
                     else
                     {
-                        return BadRequest("Only topic creators and admins can add subscribers");
+                        return BadRequest("User not found");
                     }
+                }
+                else
+                {
+                    return BadRequest("Only topic creators and admins can add subscribers");
                 }
             }
             catch (Exception e)
